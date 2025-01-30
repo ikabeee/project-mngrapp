@@ -14,8 +14,8 @@ export default function AdminDashboard() {
             <PieChart />
           </div>
         </div>
+        <TableProjects />
       </div>
-      <TableProjects />
     </>
   );
 }

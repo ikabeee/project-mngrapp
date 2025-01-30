@@ -89,14 +89,6 @@ export function Sidebar() {
             >
               <span>➕</span> Crear Usuario
             </button>
-            <button
-              onClick={handleNavigateToDashboard}
-              className="w-full bg-[#40251B] text-white hover:bg-[#301a12] 
-                          p-2.5 rounded-lg flex items-center justify-center gap-2
-                          transition-colors duration-200 mt-2"
-            >
-              <span>🏠</span> Ir al Dashboard
-            </button>
           </>
         ) : (
           <div className="p-2">
