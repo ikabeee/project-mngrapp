@@ -33,11 +33,13 @@ export default function LogoutButton() {
             <Button
                 type="button"
                 onClick={handleLogout}
-                className="bg-[#40251B] text-[#D9D0C1] font-bold hover:bg-[#301a12] transition-colors"
+                className="w-full h-12 text-lg font-semibold bg-[#40251B] text-[#D9D0C1] 
+             hover:bg-[#301a12] transition-all rounded-xl flex items-center justify-center"
                 disabled={loading}
             >
                 {loading ? <Spinner color="warning" /> : 'Cerrar sesión'}
             </Button>
+
 
             {error && (
                 <div className="flex flex-col w-full">

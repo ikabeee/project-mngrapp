@@ -96,7 +96,7 @@ export default function Login() {
                             placeholder="example@utcancun.edu.mx"
                             onBlur={(e) => {
                                 if (!securityRegex.email.test(e.target.value)) {
-                                    setError('EMAIL_INVALID');
+                                    setError('Por favor introduce un email válido');
                                 }
                             }}
                         />
