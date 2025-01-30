@@ -7,8 +7,11 @@ const getProfile = () => api.get('/auth/profile');
 
 const logout = () => api.post('/auth/logout');
 
+const validateSecurityAnswer = (data) => api.post('/auth/validate-security-answer', data);
+
+
 const AuthService = {
-    login, getProfile, logout
+    login, getProfile, logout, validateSecurityAnswer
 }
 
 export default AuthService;

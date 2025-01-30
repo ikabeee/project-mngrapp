@@ -7,11 +7,13 @@ import { CreateUsers } from './pages/CreateUsers';
 import NotFound from './pages/errors/NotFound';
 import CollaboratorDashboard from './pages/CollaboratorDashboard';
 import { Layout } from './layouts/Layout';
+import { SecretQuestionMFA } from './components/SecretQuestionMFA';
 
 function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/secret-question-mfa" element={<SecretQuestionMFA />} />
       <Route path="/error/forbidden" element={<Forbidden />} />
 
       {/* Rutas protegidas con layout común */}

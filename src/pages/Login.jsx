@@ -44,16 +44,11 @@ export default function Login() {
             if (!securityRegex.email.test(rawData.email)) {
                 throw new Error('Por favor introduce un email válido');
             }
-            await AuthService.login(rawData);
-            const profile = await AuthService.getProfile();
-            const dashboardRoutes = {
-                Guest: '/error/forbidden',
-                Leader: '/dashboard/leader',
-                Collaborator: '/dashboard/collaborator',
-                Moderator: 'dashboard/moderator',
-                Admin: '/dashboard/admin',
-            }
-            navigate(dashboardRoutes[profile.data.role] || '/error/forbidden' );
+            const user = await AuthService.login(rawData);
+            const userData = user.data;
+            console.log(userData);
+            navigate("/secret-question-mfa", { state: { userData } })
+
         } catch (e) {
             const errorCode = e.response?.data?.message || 'NETWORK_ERROR';
             setError(errorMessages[errorCode] || 'Ocurrió un error inesperado');

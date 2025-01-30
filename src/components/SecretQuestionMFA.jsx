@@ -1,13 +1,29 @@
-/* eslint-disable react/prop-types */
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
 import { FormInput } from "./FormInput"
 import { LockClosedIcon } from "@heroicons/react/24/solid"
+import AuthService from "../services/Auth"
 
-export function SecretQuestionMFA({ secretQuestion, onSubmit }) {
+export function SecretQuestionMFA() {
   const [answer, setAnswer] = useState("")
   const [error, setError] = useState("")
+  const [secretQuestion, setSecretQuestion] = useState("")
+  const [userId, setUserId] = useState(null)
+  const location = useLocation()
+  const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    const userData = location.state?.userData
+    if (userData && userData.question && userData.status === "WAITING_FOR_SECURITY_QUESTION") {
+      setSecretQuestion(userData.question)
+      setUserId(userData.userId)
+    } else {
+      // Redirect to login if no valid data is present
+      navigate("/login")
+    }
+  }, [location, navigate])
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
 
@@ -25,8 +41,42 @@ export function SecretQuestionMFA({ secretQuestion, onSubmit }) {
       return
     }
 
-    // Si pasa las validaciones, llamamos a la función onSubmit
-    onSubmit(answer)
+    try {
+      const response = await AuthService.validateSecurityAnswer({
+        userId: userId,
+        securityAnswer: answer,
+      })
+      console.log(response);
+
+      if (response.data.token) {
+        // Security answer validated successfully
+        const profile = await AuthService.getProfile()
+        const dashboardRoutes = {
+          Guest: "/error/forbidden",
+          Leader: "/dashboard/leader",
+          Collaborator: "/dashboard/collaborator",
+          Moderator: "/dashboard/moderator",
+          Admin: "/dashboard/admin",
+        }
+        navigate(dashboardRoutes[profile.data.role] || "/error/forbidden")
+      }
+    } catch (error) {
+      if (error.response) {
+        switch (error.response.data.message) {
+          case "INCORRECT_SECURITY_ANSWER":
+            setError("Respuesta de seguridad incorrecta. Por favor, inténtelo de nuevo.")
+            break
+          case "USER_NOT_FOUND":
+            setError("Usuario no encontrado. Por favor, vuelva a iniciar sesión.")
+            navigate("/login")
+            break
+          default:
+            setError("Ocurrió un error inesperado. Por favor, inténtelo de nuevo más tarde.")
+        }
+      } else {
+        setError("Ocurrió un error al verificar la respuesta. Por favor, inténtelo de nuevo.")
+      }
+    }
   }
 
   return (
