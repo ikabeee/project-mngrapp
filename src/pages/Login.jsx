@@ -42,7 +42,7 @@ export default function Login() {
                 password: sanitizeInput(formData.get('password'))
             }
             if (!securityRegex.email.test(rawData.email)) {
-                throw new Error('EMAIL_INVALID');
+                throw new Error('Por favor introduce un email válido');
             }
             await AuthService.login(rawData);
             const profile = await AuthService.getProfile();
@@ -53,7 +53,7 @@ export default function Login() {
                 Moderator: 'dashboard/moderator',
                 Admin: '/dashboard/admin',
             }
-            navigate(dashboardRoutes[profile.role] || '/error/forbidden' );
+            navigate(dashboardRoutes[profile.data.role] || '/error/forbidden' );
         } catch (e) {
             const errorCode = e.response?.data?.message || 'NETWORK_ERROR';
             setError(errorMessages[errorCode] || 'Ocurrió un error inesperado');
