@@ -7,6 +7,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import { CreateUsers } from './pages/CreateUsers';
 import NotFound from './pages/errors/NotFound';
 import CollaboratorDashboard from './pages/CollaboratorDashboard';
+import { Layout } from './layouts/Layout';
 
 
 function App() {
@@ -19,13 +20,20 @@ function App() {
         <Route path="/error/forbidden" element={<Forbidden />} />
 
         <Route element={<ProtectedRoutes allowedRoles={['Admin']} />}>
-          <Route path="/admin/create-user" element={<CreateUsers />} />
-          <Route path="/dashboard/admin" element={<AdminDashboard />} />
+          <Route element={<Layout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="/admin/create-user" element={<CreateUsers />} />
+            <Route path="/dashboard/admin" element={<AdminDashboard />} />
+          </Route>
+        </Route>
+ 
+        <Route element={<ProtectedRoutes allowedRoles={['Collaborator']} />}>
+          <Route element={<Layout />}>
+            <Route index element={<CollaboratorDashboard />} />
+            <Route path="/dashboard/collaborator" element={<CollaboratorDashboard />} />
+          </Route>
         </Route>
 
-        <Route element={<ProtectedRoutes allowedRoles={['Collaborator']} />}>
-          <Route path="/dashboard/collaborator" element={<CollaboratorDashboard />} />
-        </Route>
 
         <Route path="*" element={<NotFound />} />
 
