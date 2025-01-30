@@ -26,7 +26,8 @@ export default function Login() {
         "UNEXPECTED_ERROR": "¡No sabemos lo que sucede!",
         "USER_NOT_FOUND": "Usuario no encontrado",
         "INCORRECT_PASSWORD": "Contraseña incorrecta", 
-        "EMAIL_OR_PAYROLLNUMBER_MISSING": "Por favor, introduce tu correo electrónico"
+        "EMAIL_OR_PAYROLLNUMBER_MISSING": "Por favor, introduce tu correo electrónico",
+        "EMAIL_INVALID": "Por favor introduce un email válido",
     }
     const navigate = useNavigate();
 
