@@ -1,3 +1,5 @@
+import { DashboardMember } from './pages/DashboardMember'
+
 
 import { Route, Routes } from 'react-router';
 import Login from './pages/Login';
@@ -12,9 +14,11 @@ import { Layout } from './layouts/Layout';
 
 function App() {
 
-
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
+      <div className="flex flex-1">
+        <DashboardMember />
+      </div>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/error/forbidden" element={<Forbidden />} />
@@ -38,9 +42,8 @@ function App() {
         <Route path="*" element={<NotFound />} />
 
       </Routes>
-    </>
+    </div>
   )
 }
 
 export default App
-
