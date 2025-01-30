@@ -1,4 +1,4 @@
-import { UserCreationForm } from "./../components/UserCreationForm"
+import { UserCreationForm } from "../components/UserCreationForm"
 
 export function CreateUsers() {
   return (
