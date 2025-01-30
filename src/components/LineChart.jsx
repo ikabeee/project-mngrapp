@@ -95,7 +95,7 @@ export default function LineChart() {
         </div>
         <div>
           <Typography variant="h6" color="blue-gray" className="font-bold">
-            Tendencias de Ventas Mensuales
+            Ingresos Mensuales
           </Typography>
           <Typography
             variant="small"
