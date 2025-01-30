@@ -1,20 +1,21 @@
-import { useState } from "react"
-import { UserPlusIcon } from "@heroicons/react/24/solid"
-import { FormInput } from "./FormInput"
-import { FormSelect } from "./FormSelect"
+import { useState } from "react";
+import { UserPlusIcon } from "@heroicons/react/24/solid";
+import { FormInput } from "./FormInput";
+import { FormSelect } from "./FormSelect";
 
-const roles = ["Invitado", "Usuario", "Administrador"]
+const roles = ["Invitado", "Usuario", "Administrador"];
 
 // Función para validar contra inyecciones
 const validateAgainstInjection = (value) => {
-  const sqlPattern = /(\b(SELECT|INSERT|UPDATE|DELETE|FROM|WHERE|DROP|TABLE|ALTER)\b)|('|"|;|--|\/\*|\*\/|@@|@)/i
-  const scriptPattern = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi
+  const sqlPattern =
+    /(\b(SELECT|INSERT|UPDATE|DELETE|FROM|WHERE|DROP|TABLE|ALTER)\b)|('|"|;|--|\/\*|\*\/|@@|@)/i;
+  const scriptPattern = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
 
   if (sqlPattern.test(value) || scriptPattern.test(value)) {
-    return "Entrada no válida. Por favor, evite caracteres especiales o palabras clave."
+    return "Entrada no válida. Por favor, evite caracteres especiales o palabras clave.";
   }
-  return null
-}
+  return null;
+};
 
 export function UserCreationForm() {
   const [formData, setFormData] = useState({
@@ -27,94 +28,102 @@ export function UserCreationForm() {
     security_question: "",
     security_answer: "",
     role: "Invitado",
-  })
+  });
 
-  const [errors, setErrors] = useState({})
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
-    }))
+    }));
     if (errors[name]) {
       setErrors((prevErrors) => ({
         ...prevErrors,
         [name]: "",
-      }))
+      }));
     }
-  }
+  };
 
   const validateForm = () => {
-    const newErrors = {}
+    const newErrors = {};
 
     // Validación contra inyecciones para todos los campos
     for (const [key, value] of Object.entries(formData)) {
-      const injectionError = validateAgainstInjection(value)
+      const injectionError = validateAgainstInjection(value);
       if (injectionError) {
-        newErrors[key] = injectionError
+        newErrors[key] = injectionError;
       }
     }
 
     if (!formData.firstName.trim()) {
-      newErrors.firstName = "El nombre es obligatorio"
+      newErrors.firstName = "El nombre es obligatorio";
     } else if (formData.firstName.length < 2) {
-      newErrors.firstName = "El nombre debe tener al menos 2 caracteres"
+      newErrors.firstName = "El nombre debe tener al menos 2 caracteres";
     }
 
     if (!formData.lastName.trim()) {
-      newErrors.lastName = "El apellido es obligatorio"
+      newErrors.lastName = "El apellido es obligatorio";
     } else if (formData.lastName.length < 2) {
-      newErrors.lastName = "El apellido debe tener al menos 2 caracteres"
+      newErrors.lastName = "El apellido debe tener al menos 2 caracteres";
     }
 
     if (!formData.username.trim()) {
-      newErrors.username = "El nombre de usuario es obligatorio"
+      newErrors.username = "El nombre de usuario es obligatorio";
     } else if (formData.username.length < 3) {
-      newErrors.username = "El nombre de usuario debe tener al menos 3 caracteres"
+      newErrors.username =
+        "El nombre de usuario debe tener al menos 3 caracteres";
     } else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
-      newErrors.username = "El nombre de usuario solo puede contener letras, números y guiones bajos"
+      newErrors.username =
+        "El nombre de usuario solo puede contener letras, números y guiones bajos";
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = "El correo electrónico es obligatorio"
+      newErrors.email = "El correo electrónico es obligatorio";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Formato de correo electrónico inválido"
+      newErrors.email = "Formato de correo electrónico inválido";
     }
 
     if (!formData.password.trim()) {
-      newErrors.password = "La contraseña es obligatoria"
+      newErrors.password = "La contraseña es obligatoria";
     } else if (formData.password.length < 8) {
-      newErrors.password = "La contraseña debe tener al menos 8 caracteres"
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(formData.password)) {
+      newErrors.password = "La contraseña debe tener al menos 8 caracteres";
+    } else if (
+      !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(
+        formData.password
+      )
+    ) {
       newErrors.password =
-        "La contraseña debe contener al menos una letra mayúscula, una minúscula, un número y un carácter especial"
+        "La contraseña debe contener al menos una letra mayúscula, una minúscula, un número y un carácter especial";
     }
 
     if (formData.payrollNumber && !/^\d+$/.test(formData.payrollNumber)) {
-      newErrors.payrollNumber = "El número de nómina debe contener solo dígitos"
+      newErrors.payrollNumber =
+        "El número de nómina debe contener solo dígitos";
     }
 
     if (!formData.security_question.trim()) {
-      newErrors.security_question = "La pregunta de seguridad es obligatoria"
+      newErrors.security_question = "La pregunta de seguridad es obligatoria";
     } else if (formData.security_question.length < 10) {
-      newErrors.security_question = "La pregunta de seguridad debe tener al menos 10 caracteres"
+      newErrors.security_question =
+        "La pregunta de seguridad debe tener al menos 10 caracteres";
     }
 
     if (!formData.security_answer.trim()) {
-      newErrors.security_answer = "La respuesta de seguridad es obligatoria"
+      newErrors.security_answer = "La respuesta de seguridad es obligatoria";
     } else if (formData.security_answer.length < 3) {
-      newErrors.security_answer = "La respuesta de seguridad debe tener al menos 3 caracteres"
+      newErrors.security_answer =
+        "La respuesta de seguridad debe tener al menos 3 caracteres";
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (validateForm()) {
-      console.log("Formulario enviado:", formData)
       setFormData({
         firstName: "",
         lastName: "",
@@ -125,9 +134,9 @@ export function UserCreationForm() {
         security_question: "",
         security_answer: "",
         role: "Invitado",
-      })
+      });
     }
-  }
+  };
 
   return (
     <div className="max-w-2xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
@@ -204,7 +213,14 @@ export function UserCreationForm() {
           onChange={handleChange}
           error={errors.security_answer}
         />
-        <FormSelect label="Rol" id="role" name="role" value={formData.role} onChange={handleChange} options={roles} />
+        <FormSelect
+          label="Rol"
+          id="role"
+          name="role"
+          value={formData.role}
+          onChange={handleChange}
+          options={roles}
+        />
         <div>
           <button
             type="submit"
@@ -215,6 +231,5 @@ export function UserCreationForm() {
         </div>
       </form>
     </div>
-  )
+  );
 }
-

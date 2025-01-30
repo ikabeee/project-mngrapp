@@ -46,7 +46,6 @@ export default function Login() {
             }
             const user = await AuthService.login(rawData);
             const userData = user.data;
-            console.log(userData);
             navigate("/secret-question-mfa", { state: { userData } })
 
         } catch (e) {

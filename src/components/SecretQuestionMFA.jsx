@@ -46,7 +46,6 @@ export function SecretQuestionMFA() {
         userId: userId,
         securityAnswer: answer,
       })
-      console.log(response);
 
       if (response.data.token) {
         // Security answer validated successfully
