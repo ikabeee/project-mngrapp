@@ -1,12 +1,12 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router";
 import AuthService from "../services/Auth";
 import { Spinner } from "@heroui/spinner";
-export default function ProtectedRoutes() {
+export default function ProtectedRoutes({ allowedRoles }) {
     const [isLoading, setIsLoading] = useState(true);
     const [userRole, setUserRole] = useState(null);
-    const allowedRoles = ["Admin", "Guest", "Collaborator", "Leader", "Moderator"];
     useEffect(() => {
         const verifyAuth = async () => {
             try {
@@ -22,7 +22,9 @@ export default function ProtectedRoutes() {
         verifyAuth();
     }, []);
     if (isLoading) {
-        return <Spinner color="warning" label="Cargando..." />;
+        return <div className="flex items-center justify-center h-screen">
+            <Spinner color="warning" label="Cargando..." />
+        </div>
     }
     if (!userRole) {
         return <Navigate to='/login' replace />

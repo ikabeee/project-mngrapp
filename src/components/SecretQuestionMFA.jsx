@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState } from "react"
 import { FormInput } from "./FormInput"
 import { LockClosedIcon } from "@heroicons/react/24/solid"
