@@ -6,11 +6,22 @@ import AuthService from "../services/Auth";
 import { useNavigate } from "react-router";
 import { Alert } from "@heroui/alert";
 import { Spinner } from "@heroui/spinner";
+import DOMPurify from 'dompurify';
 export default function Login() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [isVisible] = useState(true);
     const title = "¡Oops, ocurrió un error! Inténtalo de nuevo";
+    const securityRegex = {
+        email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+        password: /^[a-zA-Z0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]*$/,
+        sanitize: /[^a-zA-Z0-9@._-\s]/gi
+    }
+
+    const sanitizeInput = (value) => {
+        return DOMPurify.sanitize(value.replace(securityRegex))
+    };
+
     const errorMessages = {
         "UNEXPECTED_ERROR": "¡No sabemos lo que sucede!",
         "USER_NOT_FOUND": "Usuario no encontrado",
@@ -24,8 +35,15 @@ export default function Login() {
         setLoading(true);
         setError(null);
         try {
-            const formData = Object.fromEntries(new FormData(e.currentTarget));
-            await AuthService.login(formData);
+            const formData = new FormData(e.currentTarget);
+            const rawData = {
+                email: sanitizeInput(formData.get('email')),
+                password: sanitizeInput(formData.get('password'))
+            }
+            if (!securityRegex.email.test(rawData.email)) {
+                throw new Error('EMAIL_INVALID');
+            }
+            await AuthService.login(rawData);
             const profile = await AuthService.getProfile();
             const dashboardRoutes = {
                 Guest: '/error/forbidden',
@@ -43,7 +61,6 @@ export default function Login() {
         }
 
     }
-
 
     return (
         <div className="min-h-screen bg-[#D9D0C1] flex items-center justify-center p-4">
@@ -76,6 +93,11 @@ export default function Login() {
                             labelPlacement="inside"
                             name="email"
                             placeholder="example@utcancun.edu.mx"
+                            onBlur={(e) => {
+                                if (!securityRegex.email.test(e.target.value)) {
+                                    setError('EMAIL_INVALID');
+                                }
+                            }}
                         />
                         <Input
                             isRequired
