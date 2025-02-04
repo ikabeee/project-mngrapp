@@ -1,6 +1,6 @@
 import api from '../config/api'
 
-const create =(data)=>  api.post('/user/login', data);
+const create =(data)=>  api.post('/user/create', data);
 
 const changeStatus = (id, data) => api.put(`/user/changeStatus/${id}`, data);
 

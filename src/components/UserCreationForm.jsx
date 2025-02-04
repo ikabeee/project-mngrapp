@@ -1,15 +1,17 @@
 import { useState } from "react";
+import UserService from "./../services/User"; // Ajusta la ruta según sea necesario
 import { UserPlusIcon } from "@heroicons/react/24/solid";
 import { FormInput } from "./FormInput";
 import { FormSelect } from "./FormSelect";
 
-const roles = ["Invitado", "Usuario", "Administrador"];
+const roles = ["Admin", "Collaborator", "Guest"];
 
-// Función para validar contra inyecciones
+// Función de validación contra inyección (se mantiene igual)
 const validateAgainstInjection = (value) => {
   const sqlPattern =
-    /(\b(SELECT|INSERT|UPDATE|DELETE|FROM|WHERE|DROP|TABLE|ALTER)\b)|('|"|;|--|\/\*|\*\/|@@|@)/i;
-  const scriptPattern = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+    /(\b(SELECT|INSERT|UPDATE|DELETE|FROM|WHERE|DROP|TABLE|ALTER)\b)|('|;|--|\/\*|\*\/|@@)/i;
+  const scriptPattern =
+    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
 
   if (sqlPattern.test(value) || scriptPattern.test(value)) {
     return "Entrada no válida. Por favor, evite caracteres especiales o palabras clave.";
@@ -18,7 +20,7 @@ const validateAgainstInjection = (value) => {
 };
 
 export function UserCreationForm() {
-  const [formData, setFormData] = useState({
+  const initialState = {
     firstName: "",
     lastName: "",
     username: "",
@@ -27,10 +29,16 @@ export function UserCreationForm() {
     payrollNumber: "",
     security_question: "",
     security_answer: "",
-    role: "Invitado",
-  });
+    hasTeam: false,
+    status: "Active",
+    role: "Guest",
+    teamId: undefined, // Se usa undefined para evitar problemas con la validación en el backend
+  };
 
+  const [formData, setFormData] = useState(initialState);
   const [errors, setErrors] = useState({});
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -49,11 +57,13 @@ export function UserCreationForm() {
   const validateForm = () => {
     const newErrors = {};
 
-    // Validación contra inyecciones para todos los campos
+    // Validación contra inyecciones para todos los campos de tipo string
     for (const [key, value] of Object.entries(formData)) {
-      const injectionError = validateAgainstInjection(value);
-      if (injectionError) {
-        newErrors[key] = injectionError;
+      if (typeof value === "string") {
+        const injectionError = validateAgainstInjection(value);
+        if (injectionError) {
+          newErrors[key] = injectionError;
+        }
       }
     }
 
@@ -121,20 +131,31 @@ export function UserCreationForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      setFormData({
-        firstName: "",
-        lastName: "",
-        username: "",
-        email: "",
-        password: "",
-        payrollNumber: "",
-        security_question: "",
-        security_answer: "",
-        role: "Invitado",
-      });
+    if (!validateForm()) return;
+
+    try {
+      // Clonar el objeto de datos
+      const userData = { ...formData };
+
+      // Si teamId es undefined, lo eliminamos para no enviarlo
+      if (userData.teamId === undefined) {
+        delete userData.teamId;
+      }
+
+      await UserService.create(userData);
+      setSuccessMessage("Usuario creado exitosamente!");
+      setErrorMessage("");
+      setFormData(initialState);
+    } catch (error) {
+      // Extraer detalles del error
+      const errorDetail = error.response?.data || error.message;
+      setErrorMessage(
+        `Error al crear el usuario. Por favor verifique los datos. Detalle: ${JSON.stringify(errorDetail)}`
+      );
+      setSuccessMessage("");
+      console.error("Error creating user:", error);
     }
   };
 
@@ -230,6 +251,12 @@ export function UserCreationForm() {
           </button>
         </div>
       </form>
+      {successMessage && (
+        <p className="text-green-600 mt-4">{successMessage}</p>
+      )}
+      {errorMessage && (
+        <p className="text-red-600 mt-4">{errorMessage}</p>
+      )}
     </div>
   );
 }
